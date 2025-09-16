@@ -1,0 +1,9 @@
+# NetBeans specific
+/nbproject/private/
+/build/
+/dist/
+/nbbuild/
+/nbdist/
+
+# User-specific files
+nb-configuration.xml
