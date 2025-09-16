@@ -1,55 +1,70 @@
-package Negocio;
+package Controlador;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class Conectar {
-    Connection conex;
 
-    public Conectar() {
+    public static synchronized Connection getConexion() {
+        Connection conex = null;
+
         try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            
+            // Obtener DATABASE_URL de las variables de entorno
             String dbUrl = System.getenv("DATABASE_URL");
-
-            if (dbUrl != null) {
-                // Ejemplo que devuelve Railway:
-                // mysql://user:password@host:3306/database
-
-                // Quitamos el "mysql://"
+            
+            if (dbUrl != null && dbUrl.startsWith("mysql://")) {
+                // Parsear la URL de Railway
                 dbUrl = dbUrl.replaceFirst("mysql://", "");
-
-                // Separamos user:password de host:puerto/db
-                String userInfo = dbUrl.split("@")[0];   // user:password
-                String hostInfo = dbUrl.split("@")[1];   // host:3306/db
-
-                String user = userInfo.split(":")[0];
-                String pass = userInfo.split(":")[1];
-
-                String hostPort = hostInfo.split("/")[0]; // host:3306
-                String database = hostInfo.split("/")[1]; // db
-
-                String jdbcUrl = "jdbc:mysql://" + hostPort + "/" + database
-                        + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-
-                // Cargar el driver explícitamente (opcional en Java 6+, pero seguro en Tomcat)
-                Class.forName("com.mysql.cj.jdbc.Driver");
-
-                conex = DriverManager.getConnection(jdbcUrl, user, pass);
-                System.out.println("Conexion exitosa a Railway!");
+                
+                String[] parts = dbUrl.split("@");
+                if (parts.length != 2) {
+                    System.out.println("Formato incorrecto de DATABASE_URL");
+                    return null;
+                }
+                
+                String[] credentials = parts[0].split(":");
+                String[] hostAndDb = parts[1].split("/");
+                
+                if (credentials.length < 2 || hostAndDb.length < 2) {
+                    System.out.println("Formato incorrecto de DATABASE_URL");
+                    return null;
+                }
+                
+                String user = credentials[0];
+                String password = credentials[1];
+                String hostPort = hostAndDb[0];
+                String database = hostAndDb[1];
+                
+                // Construir URL JDBC
+                String url = "jdbc:mysql://" + hostPort + "/" + database + 
+                           "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&autoReconnect=true";
+                
+                conex = DriverManager.getConnection(url, user, password);
+                System.out.println("Conexión exitosa a Railway MySQL!");
+                
             } else {
-                System.err.println("DATABASE_URL no esta configurada en Railway");
+                // Fallback para desarrollo local
+                String url = "jdbc:mysql://localhost:3306/bdnegocio?autoReconnect=true&useSSL=false";
+                String usr = "root";
+                String psw = "ucss";
+                conex = DriverManager.getConnection(url, usr, psw);
+                System.out.println("Conexión local exitosa");
             }
-
+            
         } catch (ClassNotFoundException e) {
-            System.err.println("Error: No se encontro el driver JDBC de MySQL");
+            System.out.println("Error >> Driver no Instalado!!");
             e.printStackTrace();
         } catch (SQLException e) {
-            System.err.println("Error de conexion con la BD: " + e.getMessage());
+            System.out.println("Error >> de conexion con la BD: " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("Error inesperado: " + e.getMessage());
             e.printStackTrace();
         }
-    }
 
-    public Connection getConnection() {
         return conex;
     }
 }
