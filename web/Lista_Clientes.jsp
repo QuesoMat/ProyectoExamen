@@ -1,92 +1,164 @@
-<%-- 
-    Document   : Catalogo_Productos
-    Created on : 30 may. 2025, 11:15:11
-    Author     : DOCENTE
---%>
 <%@page import="Controlador.*" %>
 <%@page import="Modelo.*" %>
 <%@page import="java.util.ArrayList" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
-  <Style>
-      
-      input[type="submit" ]{
-          margin-bottom: 20px;
-          margin-right: 10px;
-      }
-    .button {
-  background-color: #04AA6D; /* Green */
-  border: none;
-  color: white;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-}
-    .table {
-       table-layout: fixed;
-       width: 95%;
-       border-collapse: collapse;
-       border: 3px solid purple;       
-    }
-thead th,
-tfoot th,
-tfoot td {
-  background: linear-gradient(
-    to bottom,
-    rgba(50, 0, 60, 0.1),
-    rgba(50, 0, 60, 0.5)
-  );
-  border: 2px solid purple;
-}
-</Style>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>NEGOCIO WEB</title>
-    </head>
-    <%!
-        Admin_Clientes ac=new Admin_Clientes();
-    %>
-    <body>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>NEGOCIO WEB</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f5a623;
+            --background-color: #f4f7f6;
+            --text-color: #333;
+            --card-bg: #fff;
+            --border-color: #e0e0e0;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: var(--box-shadow);
+            margin-top: 20px;
+        }
+
+        h3 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .button, input[type="submit"], button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            text-align: center;
+            color: #fff;
+            background-color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .button:hover, input[type="submit"]:hover, button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        a.link-button {
+            display: inline-block;
+            background-color: var(--secondary-color);
+        }
+
+        .link-button:hover {
+            background-color: #e59400;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 25px;
+        }
+
+        .styled-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 auto;
+        }
+
+        .styled-table th, .styled-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .styled-table thead th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .styled-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .styled-table tbody tr:hover {
+            background-color: #e8f4f8;
+        }
+    </style>
+</head>
+<%!
+    Admin_Clientes ac=new Admin_Clientes();
+%>
+<body>
+    <div class="container">
         <h3>LISTA DE CLIENTES</h3><br>
-        <form action="Lista_Clientes.jsp">
-        <input type="submit" value="Ver Clientes" name="btnVerCli" />
-        <a href="index.html"> <button type="button">Ir al Inicio</button></a>
-         <br>
-        <table border="1">
-            <thead>
-                <tr>
-                    <th>CODIGO</th>
-                    <th>NOMBRE CLIENTE</th>
-                    <th>DNI</th>
-                    <th>RUC</th>
-                </tr>
-            </thead>
-            <tbody>
-        <%
-           try{
-            if(request.getParameter("btnVerCli")!=null){
-                ArrayList<Cliente>lc=ac.Lista();
-                for(int n=0;n<lc.size();++n){
-                    Cliente c=lc.get(n);
-                    out.println("<tr>");
-                    out.println("<td>"+c.getIdCliente()+"</td>");
-                    out.println("<td>"+c.getCliente()+"</td>");
-                    out.println("<td>"+c.getDNI()+"</td>");
-                    out.println("<td>"+c.getRUC()+"</td>");   
-                    out.println("</tr>");
-                }
-            }
-            }catch(Exception e){
-            System.out.println(""+e);
-            }
-        %>
-         </tbody>
-        </table> 
-         <br>
-         
-        </form>      
-    </body>
+        <div class="btn-group">
+            <form action="Lista_Clientes.jsp">
+                <input type="submit" value="Ver Clientes" name="btnVerCli" class="button" />
+            </form>
+            <a href="index.html" class="button link-button">Ir al Inicio</a>
+        </div>
+        
+        <div class="table-container">
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th>CÓDIGO</th>
+                        <th>NOMBRE CLIENTE</th>
+                        <th>DNI</th>
+                        <th>RUC</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <%
+                        try{
+                            if(request.getParameter("btnVerCli")!=null){
+                                ArrayList<Cliente>lc=ac.Lista();
+                                for(int n=0;n<lc.size();++n){
+                                    Cliente c=lc.get(n);
+                                    out.println("<tr>");
+                                    out.println("<td>"+c.getIdCliente()+"</td>");
+                                    out.println("<td>"+c.getCliente()+"</td>");
+                                    out.println("<td>"+c.getDNI()+"</td>");
+                                    out.println("<td>"+c.getRUC()+"</td>");
+                                    out.println("</tr>");
+                                }
+                            }
+                        }catch(Exception e){
+                            System.out.println(""+e);
+                        }
+                    %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
 </html>
