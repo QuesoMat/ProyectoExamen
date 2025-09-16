@@ -15,17 +15,17 @@ public class Conectar {
 
             String dbUrl = System.getenv("DATABASE_URL");
 
-            if (dbUrl != null) {
+            if (dbUrl != null && !dbUrl.isEmpty()) {
                 try {
+                    // Railway: mysql://user:pass@host:port/dbname
                     URI uri = new URI(dbUrl);
 
-                    String userInfo = uri.getUserInfo(); // "user:pass"
-                    String[] userParts = userInfo.split(":");
-                    String username = userParts[0];
-                    String password = userParts[1];
+                    String[] userInfo = uri.getUserInfo().split(":");
+                    String username = userInfo[0];
+                    String password = userInfo[1];
 
                     String jdbcUrl = "jdbc:mysql://" + uri.getHost() + ":" + uri.getPort() + uri.getPath()
-                            + "?autoReconnect=true&useSSL=false";
+                            + "?serverTimezone=UTC&autoReconnect=true&useSSL=false";
 
                     conex = DriverManager.getConnection(jdbcUrl, username, password);
                     System.out.println("Conexion exitosa a Railway!");
@@ -35,7 +35,8 @@ public class Conectar {
             }
 
             if (conex == null) {
-                String url = "jdbc:mysql://localhost:3306/bdnegocio?autoReconnect=true&useSSL=false";
+                // Modo local
+                String url = "jdbc:mysql://localhost:3306/bdnegocio?serverTimezone=UTC&autoReconnect=true&useSSL=false";
                 String usr = "root";
                 String psw = "ucss";
                 conex = DriverManager.getConnection(url, usr, psw);
@@ -45,7 +46,7 @@ public class Conectar {
         } catch (ClassNotFoundException e) {
             System.out.println("Error >> Driver no Instalado!!");
         } catch (SQLException e) {
-            System.out.println(e + " Error >> de conexion con la BD");
+            System.out.println("Error SQL >> " + e.getMessage());
         }
 
         return conex;
