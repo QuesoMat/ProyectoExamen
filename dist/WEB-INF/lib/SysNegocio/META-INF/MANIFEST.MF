@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-Ant-Version: Apache Ant 1.10.14
-Created-By: 21.0.1+12-LTS-29 (Oracle Corporation)
-Class-Path: lib/mysql-connector-java-8.0.17.jar lib/jcalendar-1.4.jar
-X-COMMENT: Main-Class will be added automatically by build
-Main-Class: sysnegocio.SysNegocio
-
