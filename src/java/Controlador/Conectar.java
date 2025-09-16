@@ -1,54 +1,55 @@
-package Controlador;
+package Negocio;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.net.URI;
 
 public class Conectar {
+    Connection conex;
 
-    public static synchronized Connection getConexion() {
-        Connection conex = null;
-
+    public Conectar() {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-
             String dbUrl = System.getenv("DATABASE_URL");
 
-            if (dbUrl != null && !dbUrl.isEmpty()) {
-                try {
-                    // Railway: mysql://user:pass@host:port/dbname
-                    URI uri = new URI(dbUrl);
+            if (dbUrl != null) {
+                // Ejemplo que devuelve Railway:
+                // mysql://user:password@host:3306/database
 
-                    String[] userInfo = uri.getUserInfo().split(":");
-                    String username = userInfo[0];
-                    String password = userInfo[1];
+                // Quitamos el "mysql://"
+                dbUrl = dbUrl.replaceFirst("mysql://", "");
 
-                    String jdbcUrl = "jdbc:mysql://" + uri.getHost() + ":" + uri.getPort() + uri.getPath()
-                            + "?serverTimezone=UTC&autoReconnect=true&useSSL=false";
+                // Separamos user:password de host:puerto/db
+                String userInfo = dbUrl.split("@")[0];   // user:password
+                String hostInfo = dbUrl.split("@")[1];   // host:3306/db
 
-                    conex = DriverManager.getConnection(jdbcUrl, username, password);
-                    System.out.println("Conexion exitosa a Railway!");
-                } catch (Exception ex) {
-                    System.out.println("Error parseando DATABASE_URL: " + ex.getMessage());
-                }
-            }
+                String user = userInfo.split(":")[0];
+                String pass = userInfo.split(":")[1];
 
-            if (conex == null) {
-                // Modo local
-                String url = "jdbc:mysql://localhost:3306/bdnegocio?serverTimezone=UTC&autoReconnect=true&useSSL=false";
-                String usr = "root";
-                String psw = "ucss";
-                conex = DriverManager.getConnection(url, usr, psw);
-                System.out.println("Conexion local exitosa!");
+                String hostPort = hostInfo.split("/")[0]; // host:3306
+                String database = hostInfo.split("/")[1]; // db
+
+                String jdbcUrl = "jdbc:mysql://" + hostPort + "/" + database
+                        + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+
+                // Cargar el driver explícitamente (opcional en Java 6+, pero seguro en Tomcat)
+                Class.forName("com.mysql.cj.jdbc.Driver");
+
+                conex = DriverManager.getConnection(jdbcUrl, user, pass);
+                System.out.println("Conexion exitosa a Railway!");
+            } else {
+                System.err.println("DATABASE_URL no esta configurada en Railway");
             }
 
         } catch (ClassNotFoundException e) {
-            System.out.println("Error >> Driver no Instalado!!");
+            System.err.println("Error: No se encontro el driver JDBC de MySQL");
+            e.printStackTrace();
         } catch (SQLException e) {
-            System.out.println("Error SQL >> " + e.getMessage());
+            System.err.println("Error de conexion con la BD: " + e.getMessage());
+            e.printStackTrace();
         }
+    }
 
+    public Connection getConnection() {
         return conex;
     }
 }
